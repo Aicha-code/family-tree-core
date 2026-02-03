@@ -1,23 +1,4 @@
 ``Family Tree Core``
-`Overview`
-
-family-tree-core is a Python domain-level implementation of a family tree / kinship system.
-
-This repository focuses exclusively on the core data structures, relationships, and algorithms required to model family relationships such as parents, children, spouses, siblings, and extended kinship (e.g. cousins), without any dependency on a database, web framework, or user interface.
-
-The goal is to design a clean, privacy-first, and culturally flexible foundation that can later be integrated into different applications (CLI tools, Django apps, research tools, etc.).
-
-Motivation
-
-This project originated from a personal and cultural need to model family heritage accurately, particularly because:
-
-Families are large (many siblings)
-
-Extended kinship relationships are common
-
-Certain marriage constraints exist (e.g. no direct cousin marriage)
-
-# Family Tree Core
 
 ## Overview
 
