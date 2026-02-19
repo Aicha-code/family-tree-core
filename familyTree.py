@@ -5,6 +5,9 @@
 
 # the main is reponsible for member's data input and output, it will interact with the user to gather information about family members, such as their names, ages, and relationships. It will then use this information to create member instances and build the family tree. The main function will also display the family tree in a readable format (in the terminal), showing the relationships between members.
 
+
+
+
 class FamilyTree:
     def __init__(self):
         self.members = []
@@ -25,6 +28,10 @@ class FamilyTree:
         if not all(isinstance(x, Member) for x in (parent1, parent2, child)):
             return "Invalid member."
 
+        if parent1.gender == parent2.gender:
+            return "A child must have one male and one female parent."
+
+
         if len(child.parents) >= 2:
             return f"{child.name} already has 2 parents."
 
@@ -37,30 +44,57 @@ class FamilyTree:
 
     def divorce_members(self, member1, member2):
         # Divorce is only possible if the members were previously married or in a recognized union, and they are not already divorced.
+        if not member1.is_alive or not member2.is_alive:
+            return "Cannot divorce a deceased member."
         if member2 not in member1.spouses:
             return "They are not currently married."
-        if member2 not in member1.past_spouses:
-            member1.add_past_spouse(member2)
-            if member2 in member1.spouses:
-                member1.spouses.remove(member2)
-                member2.spouses.remove(member1)
-            return f"{member1.name} and {member2.name} are now divorced."
+        member1.add_past_spouse(member2)
+        if member2 in member1.spouses:
+            member1.spouses.remove(member2)
+            member2.spouses.remove(member1)
+        return f"{member1.name} and {member2.name} are now divorced."
 
     def marry_members(self, member1, member2):
         if not isinstance(member1, Member) or not isinstance(member2, Member):
             return "Both members must be valid Member instances."
 
+        # Prevent self marriage
+        if member1 is member2:
+            return "A member cannot marry themselves."
+
+        # Prevent marriage if deceased
+        if not member1.is_alive or not member2.is_alive:
+            return "Cannot marry a deceased member."
+
+        # Prevent close-relative marriage
+        if (
+            member2 in member1.parents
+            or member2 in member1.children
+            or member2 in self.get_siblings(member1)
+        ):
+            return "Marriage is not allowed between close relatives."
+
+        # check gender
         if member1.gender == member2.gender:
             return "Marriage requires a man and a woman."
 
         man = member1 if member1.gender == "m" else member2
         woman = member2 if man is member1 else member1
-        # A man can have up to 4 wives
+
+        # Account for cultural norms ( a maximum of 4 wives for a man and only 1 husband for a woman)
         if len(man.spouses) >= 4:
             return f"{man.name} cannot marry {woman.name} because he already has 4 wives."
 
+        if len(woman.spouses) >= 1:
+            return f"{woman.name} cannot marry {man.name} because she already has a husband."
+
+        # Prevent duplicate marriages
+        if woman in man.spouses:
+            return f"{man.name} and {woman.name} are already married."
+
         man.add_spouse(woman)
         return f"{man.name} and {woman.name} are now married."
+
     
     def get_siblings(self, member):
         siblings = set()
@@ -90,6 +124,7 @@ class FamilyTree:
         for member in self.members:
             if member.name == name:
                 return member
+        return None
 
     def __str__(self):
         if not self.members:
@@ -101,6 +136,7 @@ class FamilyTree:
         return "\n".join(lines)
 
 class Member:
+    id_counter = 1
     def __init__(self, name, age, gender):
         self.name = name
         self.age = int(age)
@@ -109,7 +145,11 @@ class Member:
         self.parents = []  # limit this to 2 parents
         self.spouses = []  # store all spouses
         self.past_spouses = []  # store past relationships for parents and spouse
+        self.is_alive = True
+        self.id = Member.id_counter
+        Member.id_counter += 1
 
+        
 
     def add_parent(self, parent):
         if len(self.parents) < 2 and parent not in self.parents:
@@ -155,10 +195,12 @@ class Member:
             for child in parent.children:
                 if child is not self:
                     siblings_set.add(child)
-        siblings = (
-            ", ".join(f"{s.name}({s.age})" for s in siblings_set) if siblings_set else "None"
-        )
 
+        siblings = (
+            ", ".join(f"{s.name}({s.age})" for s in siblings_set)
+            if siblings_set
+            else "None"
+        )
         return (
             f"{self.name} ({self.age}, {'Male' if self.gender=='m' else 'Female'})\n"
             f" Parents: {parents}\n"
