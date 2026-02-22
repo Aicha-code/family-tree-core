@@ -91,6 +91,13 @@ class FamilyTree:
 
         man.add_spouse(woman)
         return f"{man.name} and {woman.name} are now married."
+    
+    def get_parents(self, member):
+        return member.parents
+    
+    def get_couple_children(self, parent1, parent2):
+        return [child for child in parent1.children if child in parent2.children]
+    
 
     def get_siblings(self, member):
         siblings = set()
@@ -230,103 +237,3 @@ class Member:
             f" Past spouses: {past_spouses}\n"
             f" Children: {children}\n"
         )
-
-
-if __name__ == "__main__":
-
-    def ask(prompt, required=True):
-        while True:
-            v = input(prompt).strip()
-            if v or not required:
-                return v
-
-    def ask_gender(prompt):
-        while True:
-            g = input(prompt).strip().lower()
-            if g in ("m", "f"):
-                return g
-
-    def prompt_member(tree, label="member", gender=None):
-        name = ask(f"Enter {label} name: ")
-        age = ask(f"Enter {label} age: ")
-        gender = gender or ask_gender(f"What is {name}'s gender? (m/f): ")
-        return tree.create_member(name, age, gender)
-
-    def add_children(tree, parent1, parent2, parent1_is_male=True):
-        while True:
-            add_more = ask(
-                f"Add a child for {parent1.name} and {parent2.name}? (y/n): ",
-                required=True,
-            ).lower()
-            if add_more != "y":
-                break
-            child = prompt_member(tree, "child")
-            if parent1_is_male:
-                tree.add_parent_child_relationship(parent1, parent2, child)
-            else:
-                tree.add_parent_child_relationship(parent2, parent1, child)
-
-    tree = FamilyTree()
-    member = prompt_member(tree, "new member")
-
-    # parents
-    print("--- Enter parent details ---")
-    father = prompt_member(tree, "father", gender="m")
-    mother = prompt_member(tree, "mother", gender="f")
-    tree.add_parent_child_relationship(father, mother, member)
-    status = ask(
-        "Parents' relationship status: 1) Married 2) Divorced 3) None — choose 1/2/3: "
-    )
-    if status == "1":
-        tree.marry_members(father, mother)
-    elif status == "2":
-        tree.marry_members(father, mother)
-        tree.divorce_members(father, mother)
-
-    print(f"Parents added: {father.name}({father.age}) and {mother.name}({mother.age})")
-
-    # spouse and children for main member
-    if ask(f"Is {member.name} married? (y/n): ").lower() == "y":
-        spouse = prompt_member(
-            tree, "spouse", gender="f" if member.gender == "m" else "m"
-        )
-        tree.marry_members(member, spouse)
-        add_children(tree, member, spouse, parent1_is_male=(member.gender == "m"))
-
-    # past spouses
-    while (
-        ask(f"Add a past spouse for {member.name}? (y/n): ", required=False).lower()
-        == "y"
-    ):
-        past = prompt_member(
-            tree, "past spouse", gender="f" if member.gender == "m" else "m"
-        )
-        tree.marry_members(member, past)
-        tree.divorce_members(member, past)
-        add_children(tree, member, past, parent1_is_male=(member.gender == "m"))
-
-    # allow adding spouses/children for each parent
-    for parent in member.parents:
-        while (
-            ask(
-                f"Add a spouse (current/past) for {parent.name}? (y/n): ",
-                required=False,
-            ).lower()
-            == "y"
-        ):
-            partner = prompt_member(
-                tree, "partner", gender="f" if parent.gender == "m" else "m"
-            )
-            rel = ask("Type 'current' or 'past': ")
-            if rel == "current":
-                tree.marry_members(parent, partner)
-            else:
-                tree.marry_members(parent, partner)
-                tree.divorce_members(parent, partner)
-            add_children(tree, parent, partner, parent1_is_male=(parent.gender == "m"))
-
-    # final output
-    print("\n--- Member summary ---")
-    print(member)
-    print("\n*** Full family tree ***")
-    print(tree)
