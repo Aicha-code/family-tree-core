@@ -98,7 +98,6 @@ class FamilyTree:
     def get_couple_children(self, parent1, parent2):
         return [child for child in parent1.children if child in parent2.children]
     
-
     def get_siblings(self, member):
         siblings = set()
         for parent in member.parents:
