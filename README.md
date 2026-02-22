@@ -2,9 +2,18 @@
 
 ## Overview
 
-Family Tree Core is a Python domain-level implementation of a family tree / kinship system.
+Family Tree Core is a Python domain-level implementation of a family tree / kinship modeling system.
 
-This repository focuses exclusively on the core data structures, relationships, and algorithms required to model family relationships such as parents, children, spouses, siblings, and extended kinship (e.g. cousins), without any dependency on a database, web framework, or user interface.
+This repository focuses exclusively on the core data structures, relationships, and algorithms required to model family relationships such as:
+- parents
+- children
+- spouses
+- siblings
+- cousins
+- grandparents
+- extended kinship
+
+The system is intentionally built without any dependency on databases, frameworks, or user interfaces.
 
 The goal is to design a clean, privacy-first, and culturally flexible foundation that can later be integrated into different applications (CLI tools, Django apps, research tools, etc.).
 
@@ -23,25 +32,29 @@ Rather than starting with a web app or database, this repository prioritizes cor
 
 ### Included
 
-Core Member (Person) data model
+Core domain model (`Member`)
+
+Family graph coordinator (`FamilyTree`)
 
 Parent–child relationships
 
-Spousal relationships (initially simple, extensible later)
+Marriage and divorce logic
 
-Bidirectional relationship handling
+Bidirectional relationship consistency
 
-In-memory graph / tree logic
+Derived kinship algorithms:
 
-Foundational building blocks for:
 
-Siblings (derived)
+- siblings
+- full siblings
+- half siblings
+- uncles and aunts
+- cousins
+- grandparents
 
-Cousins (derived)
+In-memory family graph structure
 
-Ancestors / descendants
-
-Kinship distance (future)
+Relationship validation rules
 
 ### Explicitly Excluded
 
@@ -65,11 +78,11 @@ The system currently consists of two primary abstractions:
 Represents an individual and maintains local relationship state
 (parents, children, spouses).
 
-- Families are large (many siblings)
-- Extended kinship relationships are common
+Members act as **nodes in the family graph**.
 
 ### FamilyTree
 Acts as the graph coordinator responsible for:
+
 - member creation
 - relationship validation
 - structural queries
@@ -89,35 +102,58 @@ Extensible: designed to support multiple marriages, large families, and complex 
 
 ## Current Status
 
-This repository is in an early development phase.
+The core kinship model is now implemented and supports:
 
-Current focus:
+- marriage and divorce
+- parent–child relationships
+- sibling derivation
+- extended kinship queries
+- multi-generation traversal
 
-Modeling individuals (Member)
+The current focus is improving:
 
-Establishing correct parent–child relationships
+- graph traversal algorithms
+- relationship queries
+- testing scenarios
 
-Preparing the structure for more complex kinship logic
+The internal structure may evolve as understanding deepens.
 
-The API and internal structure may evolve as understanding deepens.
+---
+## Example Relationships Supported
+
+The system can currently derive:
+
+Child → Parents  
+Parent → Children  
+Sibling relationships  
+Half-siblings vs full siblings  
+Uncles and aunts  
+Cousins  
+Grandparents
+
+All relationships are computed dynamically from the family graph.
+---
 
 ## Planned Extensions (Future Work)
 
-Dynamic sibling and cousin computation
+Ancestor traversal
 
-Support for multiple marriages and divorce
+Descendant traversal
 
 Kinship distance calculation
 
-Cycle-safe graph traversal
+Cycle-safe graph operations
+
+Family lineage queries
+
 
 Integration with:
 
-A Django-based backend
+- A Django-based backend
 
-A private local database
+- A private local database
 
-Visualization tools
+- Visualization tools
 
 ## Ethical & Privacy Considerations
 
@@ -126,3 +162,9 @@ This project is intentionally developed as private-first:
 No real family data is included in this repository  
 
 No public database is assumed
+
+## Running the Demo
+
+To run the example family tree:
+
+python demo.py
