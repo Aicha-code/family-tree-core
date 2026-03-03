@@ -167,4 +167,12 @@ No public database is assumed
 
 To run the example family tree:
 
-python demo.py
+`python demo.py`
+
+## Running the CLI application
+
+To run the CLI:
+
+1. Navigate to the project root directory (the directory that contains familyTree.py and the cli/ folder).
+
+2. `python -m cli.cli`
