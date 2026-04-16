@@ -146,6 +146,14 @@ class FamilyTree:
             for grandparent in parent.parents:
                 grandparents.add(grandparent)
         return list(grandparents)
+    
+    def mark_member_deceased(self, member):
+        if not isinstance(member, Member):
+            return "Invalid member."
+        if not member.is_alive:
+            return f"{member.name} is already deceased."
+        member.die()
+        return f"{member.name} has passed away."
 
     def __str__(self):
         if not self.members:
@@ -206,6 +214,13 @@ class Member:
         if past_spouse not in self.past_spouses:
             self.past_spouses.append(past_spouse)
             past_spouse.past_spouses.append(self)
+    
+    def die(self):
+        self.is_alive = False
+        for spouse in self.spouses[:]:  # Use slice to avoid modifying during iteration
+            spouse.spouses.remove(self)
+            self.add_past_spouse(spouse)
+        self.spouses.clear()
 
     def __str__(self):
         parents = (
