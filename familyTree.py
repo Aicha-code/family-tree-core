@@ -4,7 +4,6 @@
 
 # the main is reponsible for member's data input and output, it will interact with the user to gather information about family members, such as their names, ages, and relationships. It will then use this information to create member instances and build the family tree. The main function will also display the family tree in a readable format (in the terminal), showing the relationships between members.
 
-
 class FamilyTree:
     def __init__(self):
         self.members = []
@@ -150,6 +149,8 @@ class FamilyTree:
     def mark_member_deceased(self, member):
         if not isinstance(member, Member):
             return "Invalid member."
+        elif member not in self.members:
+            return "Member not found in family tree."
         if not member.is_alive:
             return f"{member.name} is already deceased."
         member.die()
@@ -245,7 +246,7 @@ class Member:
         )
 
         return (
-            f"{self.name} ({self.age}, {'Male' if self.gender=='m' else 'Female'})\n"
+            f"{self.name}, {self.age} ({'Male' if self.gender=='m' else 'Female'}{', Deceased' if not self.is_alive else ''})\n"
             f" Parents: {parents}\n"
             f" Spouse(s): {current_spouses}\n"
             f" Past spouses: {past_spouses}\n"
